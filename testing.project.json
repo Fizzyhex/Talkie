@@ -1,0 +1,13 @@
+{
+    "name": "talkie-test",
+
+    "tree": {
+        "$className": "DataModel",
+
+        "ReplicatedStorage": {
+            "Talkie": {
+                "$path": ""
+            }
+        }  
+    }
+}
