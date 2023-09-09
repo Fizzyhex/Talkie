@@ -3,8 +3,6 @@ local RunService = game:GetService("RunService")
 
 local Identifiers = require(script.Parent.Identifiers)
 local Promise = require(script.Parent.Packages.Promise)
-local Symbols = require(script.Parent.Symbols)
-local runTransformers = require(script.Parent.middleware.runTransformers)
 
 local IS_CLIENT = RunService:IsClient()
 local MAX_REGISTRY_WAIT = 5
@@ -14,37 +12,13 @@ local METATABLE = {
     end
 }
 
-local function runIfNotBlocked(callback, arg1, ...)
-    if arg1 == Symbols.Block then
-        return nil
-    end
-
-    return callback(arg1, ...)
-end
-
-local function ClientChannel(remote: RemoteEvent, name: string, middlewares: { [any]: (...any) -> ...any })
+local function ClientChannel(remote: RemoteEvent, name: string)
     assert(IS_CLIENT, "Attempt to construct a ClientChannel on the server")
     local clientChannel = setmetatable({
         type = "channel",
         name = name,
     }, METATABLE)
-    local clientEventTransformers = {}
-    local fireServerTransformers = {}
     local getId
-
-    if middlewares then
-        for _, startMiddleware in middlewares do
-            local middleware = startMiddleware() 
-            
-            if middleware.beforeOnClientEvent then
-                table.insert(clientEventTransformers, middleware.beforeOnClientEvent(Symbols.Block))
-            end
-
-            if middleware.beforeFireServer then
-                table.insert(fireServerTransformers, middleware.beforeFireServer(Symbols.Block))
-            end
-        end
-    end
 
     do
         local id
@@ -65,20 +39,13 @@ local function ClientChannel(remote: RemoteEvent, name: string, middlewares: { [
     end
 
     function clientChannel:send(...)
-        runIfNotBlocked(
-            function(...)
-                remote:FireServer(...) 
-            end,
-
-            runTransformers(fireServerTransformers, getId(), ...)
-        )
+        remote:FireServer(getId(), ...)
     end
 
     function clientChannel:expect(filter: ((...any) -> (any))?)
         return Promise.new(function(resolve, reject, onCancel)
             local connection
-
-            local function onClientEvent(identifier, ...)
+            connection = remote.OnClientEvent:Connect(function(identifier, ...)
                 if identifier ~= getId() then
                     return
                 end
@@ -87,10 +54,6 @@ local function ClientChannel(remote: RemoteEvent, name: string, middlewares: { [
                     connection:Disconnect()
                     resolve(...)
                 end
-            end
-
-            connection = remote.OnClientEvent:Connect(function(...)
-                onClientEvent(runTransformers(clientEventTransformers, ...))
             end)
 
             onCancel(function()
@@ -101,16 +64,12 @@ local function ClientChannel(remote: RemoteEvent, name: string, middlewares: { [
 
     --- Subscribes to the channel - running the callback whenever we receive server data through it.
     function clientChannel:subscribe(cleanupTable: { [any]: any }, callback)
-        local function onClientEvent(identifier, ...)
+        local connection = remote.OnClientEvent:Connect(function(identifier, ...)
             if identifier ~= getId() then
                 return
             end
 
             callback(...)
-        end
-
-        local connection = remote.OnClientEvent:Connect(function(...)
-            runIfNotBlocked(onClientEvent, runTransformers(clientEventTransformers, ...))
         end)
 
         --- Unsubscribes from the channel.

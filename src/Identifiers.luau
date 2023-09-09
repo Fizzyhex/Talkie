@@ -8,14 +8,17 @@ local Identifiers = {}
 function Identifiers.registerIdentifier(remote: RemoteEvent, name: string)
     assert(RunService:IsServer(), "registerIdentifier can only be called on the server")
     local attributes = remote:GetAttributes()
+    local attributeCount = 0
     
     for identifier, attributeName in attributes do
         if attributeName == name then
             return utf8.char(tonumber(identifier) :: number)
         end
+
+        attributeCount += 1
     end
 
-    local newIndex = #attributes + 1
+    local newIndex = attributeCount + 1
     remote:SetAttribute(tostring(newIndex), name)
     return utf8.char(newIndex)
 end

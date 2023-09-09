@@ -1,1 +1,0 @@
-return { Block = newproxy(true) }
