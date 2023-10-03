@@ -1,7 +1,7 @@
 --!strict
 local RunService = game:GetService("RunService")
 
-local Promise = require(script.Parent.Packages.Promise)
+local Promise = require(script.Parent.Parent.Promise)
 
 local Identifiers = {}
 

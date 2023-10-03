@@ -3,8 +3,9 @@ local ServerChannel = require(script.ServerChannel)
 local getRuntimeRemote = require(script.getRuntimeRemote)
 
 local types = require(script.types)
+local TicketBooth = require(script.util.TicketBooth)
 
-export type ServerChannel<T...=...any> = types.ServerChannel<T...>
+export type ServerChannel<serverChannelSend, serverChannelReceive> = types.ServerChannel<serverChannelSend, serverChannelReceive>
 
 local function createLibrary(getRemote)
     local function scopeChannel(Class)
@@ -16,11 +17,16 @@ local function createLibrary(getRemote)
     return {
         ClientChannel = scopeChannel(ClientChannel),
         ServerChannel = scopeChannel(ServerChannel),
+        PlayerFilters = require(script.PlayerFilters),
 
         Util = {
             Scope = require(script.util.Scope),
+            TicketBooth = require(script.util.TicketBooth),
             doCleanup = require(script.util.doCleanup),
+            RateLimit = require(script.util.RateLimit),
         },
+        
+        nextTicket = TicketBooth(),
 
         --- Creates a new isolated instance of Talkie - useful for running tests!
         createMock = function()

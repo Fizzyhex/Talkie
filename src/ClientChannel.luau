@@ -2,7 +2,8 @@
 local RunService = game:GetService("RunService")
 
 local Identifiers = require(script.Parent.Identifiers)
-local Promise = require(script.Parent.Packages.Promise)
+local Promise = require(script.Parent.Parent.Promise)
+local TicketBooth = require(script.Parent.util.TicketBooth)
 
 local IS_CLIENT = RunService:IsClient()
 local MAX_REGISTRY_WAIT = 5
@@ -18,6 +19,8 @@ local function ClientChannel(remote: RemoteEvent, name: string)
         type = "channel",
         name = name,
     }, METATABLE)
+    local nextTicket = TicketBooth()
+    local ticketHandlerRegistered = false
     local getId
 
     do
@@ -38,11 +41,15 @@ local function ClientChannel(remote: RemoteEvent, name: string)
         end
     end
 
-    function clientChannel:send(...)
+    local function fireServer(...)
         remote:FireServer(getId(), ...)
     end
 
-    function clientChannel:expect(filter: ((...any) -> (any))?)
+    function clientChannel:send(...)
+        fireServer(...)
+    end
+
+    function clientChannel:waitForData(filter: ((...any) -> (any))?)
         return Promise.new(function(resolve, reject, onCancel)
             local connection
             connection = remote.OnClientEvent:Connect(function(identifier, ...)
@@ -60,6 +67,53 @@ local function ClientChannel(remote: RemoteEvent, name: string)
                 connection:Disconnect()
             end)
         end)
+    end
+
+    --- Ask the server for a response by opening a ticket.
+    function clientChannel:openTicket(...)
+        local ticket = nextTicket()
+        remote:FireServer({getId(), ticket}, ...)
+
+        return Promise.new(function(resolve, reject, onCancel)
+            local connection
+            connection = remote.OnClientEvent:Connect(function(identifierTable, ...)
+                if typeof(identifierTable) == "table" then
+                    if identifierTable[1] == getId() and identifierTable[2] == ticket then
+                        connection:Disconnect()
+                        local isRejection = identifierTable[3]
+
+                        if isRejection then
+                            reject(...)
+                        else
+                            resolve(...)
+                        end
+                    end
+                end
+            end)
+
+            onCancel(function()
+                connection:Disconnect()
+            end)
+        end)
+    end
+
+    function clientChannel:setTicketHandler(cleanupTable, callback)
+        assert(not ticketHandlerRegistered, "A ticket handler has already been registered!")
+        ticketHandlerRegistered = true
+
+        local connection = remote.OnServerEvent:Connect(function(identifierTable, ...)
+            if typeof(identifierTable) == "table" and identifierTable[1] == getId() then
+                local ticket = identifierTable[2]
+                
+                local function sendReply(...)
+                    remote:FireServer({ getId(), ticket }, ...)
+                end
+                
+                callback(sendReply)(...)
+            end
+        end)
+
+        table.insert(cleanupTable, connection)
     end
 
     --- Subscribes to the channel - running the callback whenever we receive server data through it.

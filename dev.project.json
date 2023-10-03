@@ -1,0 +1,11 @@
+{
+    "name": "talkie-test",
+
+    "tree": {
+        "$path": "Packages",
+
+        "Talkie": {
+            "$path": "src"
+        }
+    }
+}
