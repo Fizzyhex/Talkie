@@ -1,62 +1,87 @@
 --!strict
-local Promise = require(script.Parent.Parent.Promise)
 
 export type Resolve<T...> = (T...) -> ()
 export type Reject<T...> = Resolve<T...>
 
-export type ServerChannelSend<T...=...any> = {
-    sendToAll: (self: ServerChannelSend<T...>, T...) -> (),
-    sendToClient: (self: ServerChannelSend<T...>, Player | { [any]: Player }, T...) -> (),
-    sendToAllExcept: (self: ServerChannelSend<T...>, Player, T...) -> (),
-    sendWithFilter: (self: ServerChannelSend<T...>, ((Player) -> (any)), T...) -> (),
+export type ClientEventSend<T...> = {
+    send: (self: any, T...) -> ()
+}
+
+export type ClientEventReceive<T...> = {
+    subscribe: (
+        self: any,
+        cleanupTable: { [any]: any },
+        callback: (T...) -> (),
+        filter: ((T...) -> any)?
+    ) -> (),
+    subscribeOnce: (
+        self: any,
+        cleanupTable: { [any]: any },
+        callback: (T...) -> (),
+        filter: ((T...) -> any)?
+    ) -> (),
+}
+
+export type ClientEvent<ClientEventSend, ClientEventReceive> = ClientEventSend & ClientEventReceive
+export type ServerEvent<T...> = {
+    subscribe: (
+        self: any,
+        cleanupTable: { [any]: any },
+        callback: (...any) -> (),
+        filter: ((...any) -> any)?
+    ) -> (),
+    subscribeOnce: (
+        self: any,
+        cleanupTable: { [any]: any },
+        callback: (...any) -> (),
+        filter: ((...any) -> any)?
+    ) -> (),
+
+    sendToAll: (self: any, T...) -> (),
+    sendToPlayer: (self: any, playerOrPlayers: Player | { [any]: Player }, T...) -> (),
+    sendToAllExcept: (self: any, player: Player, T...) -> (),
+    sendFilter: (self: any, filter: ((player: Player, T...) -> boolean), T...) -> (),
+} 
+
+export type ClientDelegate<T...=...any> = {
+    setCallback: (
+        self: any,
+        cleanupTable: { [any]: any },
+        callback: (resolve: Resolve<...any>, reject: Reject<...any>) -> (...any) -> ()
+    ) -> (),
 
     subscribe: (
-        self: ServerChannelSend<T...>, 
+        self: any,
         cleanupTable: { [any]: any },
-        callback: (...unknown) -> ()
-    ) -> (() -> ()),
+        callback: (T...) -> (),
+        filter: ((T...) -> any)?
+    ) -> (),
+    subscribeOnce: (
+        self: any,
+        cleanupTable: { [any]: any },
+        callback: (T...) -> (),
+        filter: ((T...) -> any)?
+    ) -> (),
 }
 
-export type ServerChannelReceive<Resolver=(...any) -> (), Rejecter=(...any) -> ()> = {
-    setTicketHandler: (
-        self: ServerChannelReceive<Resolver, Rejecter>,
-        cleanupTable: {},
-        callback: (resolve: Resolver, reject: Rejecter) -> ((...unknown) -> ())
-    ) -> (), 
+export type ServerDelegate = {
+    setCallback: (
+        self: any,
+        cleanupTable: { [any]: any },
+        callback: (resolve: Resolve<...any>, reject: Reject<...any>) -> (...any) -> ()
+    ) -> (),
+    subscribe: (
+        self: any,
+        cleanupTable: { [any]: any },
+        callback: (...any) -> (),
+        filter: ((...any) -> any)?
+    ) -> (),
+    subscribeOnce: (
+        self: any,
+        cleanupTable: { [any]: any },
+        callback: (...any) -> (),
+        filter: ((...any) -> any)?
+    ) -> (),
 }
-
-export type ServerChannel<serverChannelSend, serverChannelReceive> = {
-    type: "channel",
-    identifier: string,
-
-    waitForDataFrom: (
-        self: ServerChannelSend<serverChannelSend, serverChannelReceive>,
-        Player,
-        ((Player, ...unknown) -> (any))?
-    ) -> Promise.TypedPromise<(Player, ...unknown)>,
-
-    waitForData: (
-        self: ServerChannelSend<serverChannelSend, serverChannelReceive>,
-        ((Player, ...unknown) -> (any))?
-    ) -> Promise.TypedPromise<(Player, ...unknown)>,
-} & serverChannelSend & serverChannelReceive
-
-export type ClientChannelSend<T...=...any> = {
-    send: (self: ClientChannel, T...) -> (),
-    openTicket: (self: ClientChannel, T...) -> Promise.Promise,
-}
-
--- TODO: Type sending and receiving tickets from the client.
--- It's likely to require 2 unique types, unlike the server.
-
-export type ClientChannelReceive<Resolver=(...any) -> (), Rejecter=(...any) -> (), T...=...any> = {
-    waitForData: (self: ClientChannel, T...) -> (),
-    openTicket: (self: ClientChannel, T...) -> Promise.Promise,
-}
-
-export type ClientChannel<Send=nil, Receive=nil> = {
-    type: "channel",
-    identifier: string,
-} & Send & Receive
 
 return nil

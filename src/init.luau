@@ -1,11 +1,15 @@
-local ClientChannel = require(script.ClientChannel)
-local ServerChannel = require(script.ServerChannel)
+local ClientDelegate = require(script.client.ClientDelegate)
+local ClientEvent = require(script.client.ClientEvent)
+local ServerDelegate = require(script.server.ServerDelegate)
 local getRuntimeRemote = require(script.getRuntimeRemote)
+local ServerEvent = require(script.server.ServerEvent)
 
 local types = require(script.types)
 local TicketBooth = require(script.util.TicketBooth)
 
-export type ServerChannel<serverChannelSend, serverChannelReceive> = types.ServerChannel<serverChannelSend, serverChannelReceive>
+export type ServerEvent<T...=...any> = types.ServerEvent<T...>
+export type ClientDelegate<T...=...any> = types.ClientDelegate<T...>
+export type ServerDelegate = types.ServerDelegate
 
 local function createLibrary(getRemote)
     local function scopeChannel(Class)
@@ -15,8 +19,10 @@ local function createLibrary(getRemote)
     end
 
     return {
-        ClientChannel = scopeChannel(ClientChannel),
-        ServerChannel = scopeChannel(ServerChannel),
+        ClientDelegate = scopeChannel(ClientDelegate),
+        ServerDelegate = scopeChannel(ServerDelegate),
+        ServerEvent = scopeChannel(ServerEvent),
+        ClientEvent = scopeChannel(ClientEvent),
         PlayerFilters = require(script.PlayerFilters),
 
         Util = {
@@ -24,6 +30,7 @@ local function createLibrary(getRemote)
             TicketBooth = require(script.util.TicketBooth),
             doCleanup = require(script.util.doCleanup),
             RateLimit = require(script.util.RateLimit),
+            TypeGuard = require(script.util.TypeGuard),
         },
         
         nextTicket = TicketBooth(),
@@ -35,7 +42,7 @@ local function createLibrary(getRemote)
             return createLibrary(function()
                 return remote
             end)
-        end
+        end,
     }
 end
 

@@ -1,11 +1,15 @@
 {
-    "name": "talkie-test",
+	"name": "talkie",
 
-    "tree": {
-        "$path": "Packages",
-
-        "Talkie": {
-            "$path": "src"
-        }
-    }
+	"tree": {
+		"$className": "DataModel",
+		"ReplicatedStorage": {
+			"Packages": {
+				"$path": "Packages",
+				"Talkie": {
+					"$path": "src"
+				}
+			}
+		}
+	}
 }
