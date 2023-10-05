@@ -32,9 +32,9 @@ local function ServerEvent(remote: RemoteEvent, name: string)
         fireAllClients(...)
     end
 
-    function serverEvent:expect(cleanupTable, filter)
+    function serverEvent:expect(filter)
         return Promise.new(function(resolve, _, onCancel)
-            local unsubscribe = serverEvent:subscribeOnce(cleanupTable, function(...)
+            local unsubscribe = serverEvent:subscribeOnce(function(...)
                 resolve(...)
             end, filter)
 
@@ -42,8 +42,8 @@ local function ServerEvent(remote: RemoteEvent, name: string)
         end)
     end
 
-    function serverEvent:expectFrom(cleanupTable, player: Player)
-        return serverEvent:expect(cleanupTable, function(sender)
+    function serverEvent:expectFrom(player: Player)
+        return serverEvent:expect(function(sender)
             return sender == player
         end)
     end

@@ -52,7 +52,7 @@ local function ServerDelegate(remote: RemoteEvent, name: string)
         end
     end
 
-    function serverDelegate:setCallback(cleanupTable, callback)
+    function serverDelegate:setCallback(callback)
         assert(not isCallbackRegistered, "A callback has already been registered")
         isCallbackRegistered = true
 
@@ -78,7 +78,9 @@ local function ServerDelegate(remote: RemoteEvent, name: string)
             end
         end)
 
-        table.insert(cleanupTable, connection)
+        return function()
+            connection:Disconnect()
+        end
     end
 
     serverDelegate.subscribe = serverNetworker.subscribe

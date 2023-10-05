@@ -13,24 +13,20 @@ export type ClientEventSend<T...> = {
 export type ClientEventReceive<T...> = {
     subscribe: (
         self: any,
-        cleanupTable: { [any]: any },
         callback: (T...) -> (),
         filter: ((T...) -> any)?
     ) -> (),
     subscribeOnce: (
         self: any,
-        cleanupTable: { [any]: any },
         callback: (T...) -> (),
         filter: ((T...) -> any)?
     ) -> (),
     expect: (
         self: any,
-        cleanupTable: { [any]: any },
         filter: ((T...) -> boolean)?
     ) -> Promise.TypedPromise<T...>,
     expectFrom: (
         self: any,
-        cleanupTable: { [any]: any },
         player: Player,
         filter: ((T...) -> boolean)?
     ) -> Promise.TypedPromise<T...>,
@@ -43,13 +39,11 @@ export type ClientEvent = ClientEventSend<...any> & ClientEventReceive<...any>
 export type ServerEvent<T...> = {
     subscribe: (
         self: any,
-        cleanupTable: { [any]: any },
         callback: (...any) -> (),
         filter: ((...any) -> any)?
     ) -> (),
     subscribeOnce: (
         self: any,
-        cleanupTable: { [any]: any },
         callback: (...any) -> (),
         filter: ((...any) -> any)?
     ) -> (),
@@ -61,12 +55,10 @@ export type ServerEvent<T...> = {
 
     expect: (
         self: any,
-        cleanupTable: { [any]: any },
         filter: ((player: Player, ...any) -> boolean)?
     ) -> Promise.TypedPromise<...any>,
     expectFrom: (
         self: any,
-        cleanupTable: { [any]: any },
         player: Player,
         filter: ((player: Player, ...any) -> boolean)?
     ) -> Promise.TypedPromise<...any>,
@@ -75,18 +67,15 @@ export type ServerEvent<T...> = {
 export type ClientDelegate<T...=...any> = {
     setCallback: (
         self: any,
-        cleanupTable: { [any]: any },
         callback: (resolve: Resolve<...any>, reject: Reject<...any>) -> (...any) -> ()
     ) -> (),
     subscribe: (
         self: any,
-        cleanupTable: { [any]: any },
         callback: (T...) -> (),
         filter: ((T...) -> any)?
     ) -> (),
     subscribeOnce: (
         self: any,
-        cleanupTable: { [any]: any },
         callback: (T...) -> (),
         filter: ((T...) -> any)?
     ) -> (),
@@ -95,18 +84,15 @@ export type ClientDelegate<T...=...any> = {
 export type ServerDelegate = {
     setCallback: (
         self: any,
-        cleanupTable: { [any]: any },
         callback: (resolve: Resolve<...any>, reject: Reject<...any>) -> (player: Player, ...any) -> ()
     ) -> (),
     subscribe: (
         self: any,
-        cleanupTable: { [any]: any },
         callback: (...any) -> (),
         filter: ((...any) -> any)?
     ) -> (),
     subscribeOnce: (
         self: any,
-        cleanupTable: { [any]: any },
         callback: (...any) -> (),
         filter: ((...any) -> any)?
     ) -> (),

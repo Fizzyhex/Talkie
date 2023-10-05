@@ -52,7 +52,7 @@ local function ClientDelegate(remote: RemoteEvent, name: string)
         end)
     end
 
-    function clientDelegate:setCallback(cleanupTable, callback)
+    function clientDelegate:setCallback(callback)
         assert(not isCallbackRegistered, "A callback has already been registered")
         isCallbackRegistered = true
 
@@ -78,7 +78,9 @@ local function ClientDelegate(remote: RemoteEvent, name: string)
             end
         end)
 
-        table.insert(cleanupTable, connection)
+        return function()
+            connection:Disconnect()
+        end
     end
 
     clientDelegate.subscribe = clientNetworker.subscribe

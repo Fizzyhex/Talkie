@@ -31,7 +31,7 @@ local function ClientNetworker(remote: RemoteEvent, name: string)
     end
 
     --- Subscribes to the channel - running the callback whenever we receive server data through it.
-    function clientNetworker:subscribe(cleanupTable: { [any]: any }, callback, filter: ((...any) -> any)?)
+    function clientNetworker:subscribe(callback, filter: ((...any) -> any)?)
         local connection = remote.OnClientEvent:Connect(function(identifier, ...)
             if identifier ~= getId() or (filter ~= nil and not filter(...)) then
                 return
@@ -42,23 +42,16 @@ local function ClientNetworker(remote: RemoteEvent, name: string)
 
         --- Unsubscribes from the channel.
         local function unsubscribe()
-            local cleanupIndex = table.find(cleanupTable, unsubscribe)
-
-            if cleanupIndex then
-                table.remove(cleanupTable, cleanupIndex)
-            end
-
             connection:Disconnect()
         end
 
-        table.insert(cleanupTable, unsubscribe)
         return unsubscribe
     end
 
     --- Subscribes to the channel and unsubscribers after the callback is called once.
-    function clientNetworker:subscribeOnce(cleanupTable: { [any]: any }, callback, filter)
+    function clientNetworker:subscribeOnce(callback, filter)
         local unsubscribe
-        unsubscribe = clientNetworker:subscribe(cleanupTable, function(...)
+        unsubscribe = clientNetworker:subscribe(function(...)
             unsubscribe()
             callback(...)
         end, filter)

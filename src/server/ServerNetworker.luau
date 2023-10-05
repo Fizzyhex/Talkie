@@ -18,8 +18,7 @@ local function ServerNetworker(remote: RemoteEvent, name: string)
     serverNetworker.id = remoteIdentifier
 
     --- Subscribes to the channel - running the callback whenever a player sends data through it.
-    function serverNetworker:subscribe(cleanupTable: { [any]: any }, callback, filter: ((...any) -> any)?)
-        local cleanupKey = newproxy(true)
+    function serverNetworker:subscribe(callback, filter: ((...any) -> any)?)
         local connection = remote.OnServerEvent:Connect(function(player, identifier, ...)
             if identifier ~= remoteIdentifier or (filter ~= nil and not filter(player, ...)) then
                 return
@@ -30,18 +29,16 @@ local function ServerNetworker(remote: RemoteEvent, name: string)
 
         --- Unsubscribes from the channel.
         local function unsubscribe()
-            cleanupTable[cleanupKey] = nil
             connection:Disconnect()
         end
 
-        cleanupTable[cleanupKey] = connection
         return unsubscribe
     end
 
     --- Subscribes to the channel and unsubscribers after the callback is called once.
-    function serverNetworker:subscribeOnce(cleanupTable: { [any]: any }, callback, filter)
+    function serverNetworker:subscribeOnce(callback, filter)
         local unsubscribe
-        unsubscribe = serverNetworker:subscribe(cleanupTable, function(...)
+        unsubscribe = serverNetworker:subscribe(function(...)
             unsubscribe()
             callback(...)
         end, filter)
