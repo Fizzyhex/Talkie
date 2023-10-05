@@ -13,7 +13,7 @@ Talkie is an experimental networking library for Roblox.
 - ♻ Lightweight
 - 🗒 Luau typings
 - 😁 Super friendly API surface
-- 🧑‍💻 Greatly extendable - pass your own filters!
+- 🧑‍💻 Greatly extensible - pass your own filters!
 - 🟣 Integration with [Promises](https://github.com/lukadev-0/rbx-typed-promise)
 
 ## Samples
