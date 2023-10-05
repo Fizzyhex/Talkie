@@ -74,7 +74,7 @@ local function ServerDelegate(remote: RemoteEvent, name: string)
                     remote:FireClient(sender, { identifier, ticket, true }, ...)
                 end
                 
-                callback(resolve, reject)(...)
+                callback(resolve, reject)(sender, ...)
             end
         end)
 

@@ -33,7 +33,7 @@ local function ClientNetworker(remote: RemoteEvent, name: string)
     --- Subscribes to the channel - running the callback whenever we receive server data through it.
     function clientNetworker:subscribe(cleanupTable: { [any]: any }, callback, filter: ((...any) -> any)?)
         local connection = remote.OnClientEvent:Connect(function(identifier, ...)
-            if identifier ~= getId() or (filter ~= nil and filter(...)) then
+            if identifier ~= getId() or (filter ~= nil and not filter(...)) then
                 return
             end
 

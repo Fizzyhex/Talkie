@@ -1,7 +1,9 @@
 --!strict
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
+local Promise = require(ReplicatedStorage.Packages.Promise)
 local ServerNetworker = require(script.Parent.ServerNetworker)
 
 local IS_SERVER = RunService:IsServer()
@@ -28,6 +30,22 @@ local function ServerEvent(remote: RemoteEvent, name: string)
 
     function serverEvent:sendToAll(...)
         fireAllClients(...)
+    end
+
+    function serverEvent:expect(cleanupTable, filter)
+        return Promise.new(function(resolve, _, onCancel)
+            local unsubscribe = serverEvent:subscribeOnce(cleanupTable, function(...)
+                resolve(...)
+            end, filter)
+
+            onCancel(unsubscribe)
+        end)
+    end
+
+    function serverEvent:expectFrom(cleanupTable, player: Player)
+        return serverEvent:expect(cleanupTable, function(sender)
+            return sender == player
+        end)
     end
 
     function serverEvent:sendToPlayer(playerOrPlayers: Player | { [any]: Player }, ...)

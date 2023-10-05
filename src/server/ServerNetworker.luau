@@ -21,7 +21,7 @@ local function ServerNetworker(remote: RemoteEvent, name: string)
     function serverNetworker:subscribe(cleanupTable: { [any]: any }, callback, filter: ((...any) -> any)?)
         local cleanupKey = newproxy(true)
         local connection = remote.OnServerEvent:Connect(function(player, identifier, ...)
-            if identifier ~= remoteIdentifier or (filter ~= nil and filter(player, ...)) then
+            if identifier ~= remoteIdentifier or (filter ~= nil and not filter(player, ...)) then
                 return
             end
 

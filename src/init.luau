@@ -7,7 +7,13 @@ local ServerEvent = require(script.server.ServerEvent)
 local types = require(script.types)
 local TicketBooth = require(script.util.TicketBooth)
 
+export type ClientEvent = types.ClientEvent
 export type ServerEvent<T...=...any> = types.ServerEvent<T...>
+export type TypedClientEvent<ClientEventSend, ClientEventReceive> = types.TypedClientEvent<ClientEventSend, ClientEventReceive>
+
+export type ClientEventSend<T...=...any> = types.ClientEventSend<T...>
+export type ClientEventReceive<T...=...any> = types.ClientEventReceive<T...>
+
 export type ClientDelegate<T...=...any> = types.ClientDelegate<T...>
 export type ServerDelegate = types.ServerDelegate
 
