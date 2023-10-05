@@ -7,7 +7,7 @@
 
 Talkie is an experimental networking library for Roblox.
 
-## Key features
+## Key Features
 
 - 🏃 Bandwidth efficient - Have absurd amounts of remotes without any extra cost!
 - ♻ Lightweight
