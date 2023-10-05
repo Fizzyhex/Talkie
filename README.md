@@ -1,15 +1,19 @@
 # Talkie
 
+
 > ⚠ This library is a work in progress! It's API surface may change significantly with updates and their may be bugs. Use at your own risk!
 
-Talkie is an experimental networking library for Roblox. 
+[View on Wally](https://wally.run/package/fizzyhex/talkie?version=0.1.0)
+
+Talkie is an experimental networking library for Roblox.
 
 ## Key features
 
-- Bandwidth efficient
-- Lightweight
-- Super friendly API surface
-- Greatly extendable - pass your own filters!
+- 🏃 Bandwidth efficient - Have absurd amounts of remotes without any extra cost!
+- ♻ Lightweight
+- 😁 Super friendly API surface
+- 🧑‍💻 Greatly extendable - pass your own filters!
+- 🟣 Integration with [Promises](https://github.com/lukadev-0/rbx-typed-promise)
 
 ## Samples
 
