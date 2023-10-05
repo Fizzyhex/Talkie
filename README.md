@@ -36,7 +36,7 @@ messageEvent:send("Hello world!")
 
 local Talkie = require(somewhere.Talkie)
 local ServerEvent = Talkie.ServerEvent
-local TypeGuard = Talkie.TypeGuard
+local TypeGuard = Talkie.Util.TypeGuard
 
 local messageEvent: Talkie.ServerEvent = ServerEvent("send_message")
 
