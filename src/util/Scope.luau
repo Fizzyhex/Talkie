@@ -13,7 +13,7 @@
     print(playersScope("playerRemoving")) -- "players/playerRemoving"
     
     -- It's possible to create scopes off of other scopes too!
-    local economyScope = Scope(playersScope())
+    local economyScope = Scope(playersScope "economy")
     print(economyScope "giveMoney") -- "players/economy/giveMoney"
     ```
 ]=]
